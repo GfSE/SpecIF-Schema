@@ -53,6 +53,8 @@ class CCheck {
                 return { status: 972, statusText: "Invalid schema location" };
         };
 
+		let self = this;
+
         // Set default:
         if( typeof(options)!='object' ) options = {};
         if( !Array.isArray(options.dontCheck) ) options.dontCheck = [];
@@ -381,12 +383,16 @@ class CCheck {
                                     errorL.push({status:986, statusText:etxt+": boolean value is invalid"}); 
                                 break;
                             case 'xs:dateTime':
-                                if( checkSchema(
+                                if( self.checkSchema(
                                     '{"value":"'+val+'"}',
                                     {schema: {
-                                        id: "http://specif.de/v1.1/dateTime/schema#",
-                                        $schema: "http://json-schema.org/draft-04/schema#",
-                                        value: { type: "string", format: "date-time" }
+                                        "$id": "http://specif.de/v1.1/dateTime/schema#",
+                                        "$schema": "https://json-schema.org/draft-04/schema#",
+                                //        "$schema": "https://json-schema.org/draft/2019-09/schema#",
+                                        "type": "object",
+                                        "properties": {
+                                          "value": { "type": "string", "format": "date-time" }
+	                                    }
                                     }}
                                 ).status>0 )
                                     errorL.push({status:986, statusText: etxt+": value must be a valid date-time string according to ISO 8601"});
@@ -398,12 +404,16 @@ class CCheck {
 								// See: https://github.com/GfSE/SpecIF/issues/63
                                 break;
                             case 'xs:anyURI':
-                                if( checkSchema(
+                                if( self.checkSchema(
                                     '{"value":"'+val+'"}',
                                     {schema: {
-                                        id: "http://specif.de/v1.1/anyURI/schema#",
-                                        $schema: "http://json-schema.org/draft-04/schema#",
-                                        value: { type: "string", format: "uri" }
+                                        "$id": "http://specif.de/v1.1/anyURI/schema#",
+                                        "$schema": "https://json-schema.org/draft-04/schema#",
+                                //        "$schema": "https://json-schema.org/draft/2019-09/schema#",
+                                        "type": "object",
+                                        "properties": {
+                                          "value": { "type": "string", "format": "uri" }
+	                                    }
                                     }}
                                 ).status>0 )
                                     errorL.push({status:986, statusText: etxt+": value must be a valid URI string according to according to RFC 3986"});
