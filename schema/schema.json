@@ -747,7 +747,7 @@
           "$ref": "#/definitions/SpecifId"
         },
         "title": {
-          "description": "The file's name.",
+          "description": "The file's name, usually with an extension indicating it's type.",
           "type": "string"
         },
         "description": {
