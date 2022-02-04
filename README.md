@@ -24,11 +24,11 @@ but the structure is always the same: When a certain element *may* have several 
 ## Constraints
 
 In addition to the schema, the following constraints apply for SpecIF v1.1:
-- An item's *key* consisting of *id* and *revision* must be unique. By default of a revision, the id must be unique.
+- An item's 'key' consisting of 'id' and 'revision' must be unique. By default of a revision, the id must be unique.
 - dataType 'xs:integer' or 'xs:double': If both exist, 'minInclusive' must be smaller or equal than 'maxInclusive'.
-- dataType: If present, a list of enumerated values must have at least one entry.
-- dataType except 'xs:string': If present, a list of enumerated values must have entries of type string.
-- dataType 'xs:string': If present, a list of enumerated values must have entries with a list of multi-language texts each.
+- dataType: If present, the list of enumerated values must have at least one entry.
+- dataType except 'xs:string': If present, the list of enumerated values must have entries of type string.
+- dataType 'xs:string': If present, the list of enumerated values must have entries with multi-language texts each.
 - A propertyClass's 'dataType' must reference a member of dataTypes by key.
 - propertyClass: If present, the list of default values must not have more than one value, unless 'multiple' is true.
 - propertyClass: If present, the list of default values must have valid entries according to the referenced dataType (see below).
@@ -46,6 +46,7 @@ In addition to the schema, the following constraints apply for SpecIF v1.1:
 - A statement's 'subject' must have a class which is listed in the subjectClasses of the statement's class, if such subjectClasses are defined.
 - A statement's 'object' must reference a valid resource or statement.
 - A statement's 'object' must have a class which is listed in the objectClasses of the statement's class, if such objectClasses are defined.
+- A statement's 'subject' and 'object' may have the same id, but if so, the revisions must be different (because only one revision of an element can be valid at a time).
 - A statement's 'properties' must have valid entries according to the referenced dataType (see below).
 - A node's 'resource' must reference a member of resources by key.
 - The list of values must not have more than one item, unless 'multiple' of the propertyClass (or by default of the dataType) is true.
