@@ -289,8 +289,8 @@ class CCheck {
                 classL = data[rClasses].concat(data[sClasses]);
             data.statements.forEach( function(sta,i) {
 
-                let subj = itemByKey( instanceL, sta.subject ),   // the statement's subject, can be a resource or a statement
-                    obj = itemByKey( instanceL, sta.object );     // the statement's object, can be a resource or a statement
+                let subj = itemByKey( instanceL, sta.subject ),   // the statement's subject, can be a resource or (starting with v0.10.8) a statement
+                    obj = itemByKey( instanceL, sta.object );     // the statement's object, can be a resource or (starting with v0.10.8) a statement
 
                 // A statement's "subject" must be the key of a member of "resources" or "statements":
                 if( !subj && options.dontCheck.indexOf('statement.subject')<0 ) 
@@ -300,10 +300,6 @@ class CCheck {
                 if( !obj && options.dontCheck.indexOf('statement.object')<0 ) 
                     errorL.push({status:980, statusText: "object of statement["+i+"] with identifier '"+sta.id+"' must reference a valid resource or statement"});
 
-                // The statement's subject and object may be the same, but not with different revisions:
-				if( subj && obj && subj.id == obj.id && subj.revision != obj.revision )
-                    errorL.push({status:980, statusText: "subject and object of statement["+i+"] with identifier '"+sta.id+"' may have the same id, but not of different revisions"});
-
                 let staC = itemByKey( data[sClasses], sta[sClass] );   // the statement's class
                 
                 // If there are no staC[subClasses], all subjectClasses are eligible and so no checking is necessary.
@@ -312,7 +308,8 @@ class CCheck {
                     staC[subClasses].forEach( function(c) { let e=itemByKey( classL, c ); if(e) eligibleCL.push(e); });
 
                     // The subject's class must be listed in the statementClass' subjectClasses;
-                    // resources and statements are eligible, both have the same 'class' attribute, so subj[rClass] covers all cases:
+                    // in earlier versions, only resources were eligible as subject and object,
+                    // and in later versions, where resources and statements are eligible, both have the same 'class' attribute, so subj[rClass] covers all cases:
                     if( uniqueByKey( eligibleCL, subj[rClass] ) )
                         errorL.push({status:981, statusText: "the subject of statement["+i+"] with identifier '"+sta.id+"' has a class which is not listed in the "+subClasses+" of the statement's class"});
                 };
@@ -325,6 +322,8 @@ class CCheck {
                     if( uniqueByKey( eligibleCL, obj[[rClass]] ) )
                         errorL.push({status:981, statusText: "the object of statement["+i+"] with identifier '"+sta.id+"' has a class which is not listed in the "+objClasses+" of the statement's class"});
                 };
+
+                // The statement's subject and object may be the same ... thus no check on identical values
             });
 
             // property values ("content") must fit the respective class' range:
@@ -546,7 +545,7 @@ class CCheck {
             if( itemsWithEqId.length==1 && !itemsWithEqId[0].revision ) {
                 // a single item without revision has been found:
                 if( k.revision ) return // revisions don't match (this should not occur)
-                return itemsWithEqId[0] // both the found element and the key have no revision
+                else return itemsWithEqId[0] // both the found element and the key have no revision
             };
         
             // The elements in L have a revision and there may be more than 1 of them.
