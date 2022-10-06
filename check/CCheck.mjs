@@ -5,7 +5,7 @@
 *   We appreciate any correction, comment or contribution via e-mail to issues@specif.de
 *   .. or even better as Github issue (https://github.com/GfSE/SpecIF/issues)
 */
-class CCheck {
+export class CCheck {
     constructor() {
         this.ajv = new Ajv({allErrors: true});
     }
