@@ -11,7 +11,7 @@ Take a look here or at https://specif.de for details.
 
 The SpecIF schema is developed according to [JSON-schema](http://json-schema.org) using this [Github repository](./schema/). It is hosted by
 - SpecIF Home: https://specif.de/v1.0/schema.json and https://specif.de/v1.1/schema.json
-- Schemastore.org: https://json.schemastore.org/specif-1.0.json
+- Schemastore.org: https://json.schemastore.org/specif-1.0.json and https://json.schemastore.org/specif-1.1.json
 
 Sometimes the question is raised why there is a version v1.1 so shortly after v1.0. In fact there is no need for any additional feature. 
 SpecIF v1.0 is particularly well suited to get acquainted with SpecIF concepts, as simple tasks allow a simple representation. 
