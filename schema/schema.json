@@ -125,7 +125,7 @@
       "enum": [ "plain", "xhtml" ]
     },
     "SpecifMultiLanguageText": {
-      "description": "A list of items with text and language properties. If the information is be provided in multiple languages, the language must be specified for proper selection; it is however not required by the schema to avoid a lot of overhead in most cases with a single language.",
+      "description": "A list of items with text and language properties. If the information is provided in multiple languages, the language must be specified for proper selection; it is however not required by the schema to avoid a lot of overhead in most cases with a single language.",
       "type": "array",
       "uniqueItems": true,
       "items": {
