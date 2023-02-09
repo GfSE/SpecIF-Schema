@@ -3,7 +3,7 @@
 *   License: Apache 2.0 (http://www.apache.org/licenses/)
 *   Author: se@enso-managers.de, enso managers gmbh, Berlin (http://www.enso-managers.de)
 *   We appreciate any correction, comment or contribution via e-mail to issues@specif.de
-*   .. or even better as Github issue (https://github.com/GfSE/SpecIF/issues)
+*   .. or even better as Github issue (https://github.com/GfSE/SpecIF-Schema/issues)
 */
 export class CCheck {
     constructor() {
