@@ -33,6 +33,11 @@ class CCheck {
         // An object similar to jqXHR, namely {status:900,statusText:"abc",responseType:"text",responseText:"xyz"}, is returned.
         // ToDo: localize messages
 
+        // Certain checks are only done, if listed in options.doCheck;
+        // the following values are recognized:
+        // - 'class.subjectClasses'
+        // - 'class.objectClasses'
+
         // Certain checks are skipped, if listed in options.dontCheck;
         // the following values are recognized:
         // - 'statement.subject'
@@ -55,7 +60,8 @@ class CCheck {
 
         // Set default:
         if( typeof(options)!='object' ) options = {};
-        if( !Array.isArray(options.dontCheck) ) options.dontCheck = [];
+        if( !Array.isArray(options.doCheck) ) options.doCheck = [];  // apply listed checks (which are not included by default)
+        if( !Array.isArray(options.dontCheck) ) options.dontCheck = [];  // don't apply listed checks (which are included by default)
 
         let self = this;
 
@@ -265,7 +271,7 @@ class CCheck {
                 checkPropertyClassReference( statementC );
                 // For each statement class, check subject classes and object classes:
                 [subClasses,objClasses].forEach( function(x) {  
-                    if( missingRef(aCL, statementC[x]) ) 
+                    if( options.doCheck.includes('class.'+x) && missingRef(aCL, statementC[x]) ) 
                         errorL.push({status:978, statusText: x+" of "+sClass+" '"+statementC.id+"' must reference at least one valid resourceClass or statementClass" });
                 });
             });
