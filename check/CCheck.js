@@ -35,8 +35,8 @@ class CCheck {
 
         // Certain checks are only done, if listed in options.doCheck;
         // the following values are recognized:
-        // - 'class.subjectClasses'
-        // - 'class.objectClasses'
+        // - 'statementClass.subjectClasses'
+        // - 'statementClass.objectClasses'
 
         // Certain checks are skipped, if listed in options.dontCheck;
         // the following values are recognized:
@@ -271,7 +271,7 @@ class CCheck {
                 checkPropertyClassReference( statementC );
                 // For each statement class, check subject classes and object classes:
                 [subClasses,objClasses].forEach( function(x) {  
-                    if( options.doCheck.includes('class.'+x) && missingRef(aCL, statementC[x]) ) 
+                    if( options.doCheck.includes('statementClass.'+x) && missingRef(aCL, statementC[x]) ) 
                         errorL.push({status:978, statusText: x+" of "+sClass+" '"+statementC.id+"' must reference at least one valid resourceClass or statementClass" });
                 });
             });
