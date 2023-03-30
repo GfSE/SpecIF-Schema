@@ -3,7 +3,7 @@
 *   License: Apache 2.0 (http://www.apache.org/licenses/)
 *   Author: se@enso-managers.de, enso managers gmbh, Berlin (http://www.enso-managers.de)
 *   We appreciate any correction, comment or contribution via e-mail to issues@specif.de
-*   .. or even better as Github issue (https://github.com/GfSE/SpecIF/issues)
+*   .. or even better as Github issue (https://github.com/GfSE/SpecIF-Schema/issues)
 */
 export class CCheck {
     constructor() {
@@ -33,6 +33,11 @@ export class CCheck {
         // An object similar to jqXHR, namely {status:900,statusText:"abc",responseType:"text",responseText:"xyz"}, is returned.
         // ToDo: localize messages
 
+        // Certain checks are only done, if listed in options.doCheck;
+        // the following values are recognized:
+        // - 'statementClass.subjectClasses'
+        // - 'statementClass.objectClasses'
+
         // Certain checks are skipped, if listed in options.dontCheck;
         // the following values are recognized:
         // - 'statement.subject'
@@ -55,7 +60,8 @@ export class CCheck {
 
         // Set default:
         if( typeof(options)!='object' ) options = {};
-        if( !Array.isArray(options.dontCheck) ) options.dontCheck = [];
+        if( !Array.isArray(options.doCheck) ) options.doCheck = [];  // apply listed checks (which are not included by default)
+        if( !Array.isArray(options.dontCheck) ) options.dontCheck = [];  // don't apply listed checks (which are included by default)
 
         let self = this;
 
@@ -265,7 +271,7 @@ export class CCheck {
                 checkPropertyClassReference( statementC );
                 // For each statement class, check subject classes and object classes:
                 [subClasses,objClasses].forEach( function(x) {  
-                    if( missingRef(aCL, statementC[x]) ) 
+                    if( options.doCheck.includes('statementClass.'+x) && missingRef(aCL, statementC[x]) ) 
                         errorL.push({status:978, statusText: x+" of "+sClass+" '"+statementC.id+"' must reference at least one valid resourceClass or statementClass" });
                 });
             });
