@@ -190,7 +190,7 @@ export class CCheck {
                                 for(var i=dT.enumeration.length-1;i>-1;i--) {
                                     // The presence of valid ids has been checked by schema, now check the values:
                                     if( dT.type=="xs:string" ) {
-                                        if( !isSpecifMultiLanguageText( dT.enumeration[i].value ) )
+                                        if( !isMultiLanguageValue( dT.enumeration[i].value ) )
                                             errorL.push({status:974, statusText: "dataType '"+dT.id+"' of type 'xs:string' must have enumerated values, each with a list of multi-language texts"});
                                     }
                                     else
@@ -371,7 +371,7 @@ export class CCheck {
                         switch(dT.type) {
                             case 'xs:string':
                                 // The values of a property of type 'xs:string' are multi-language objects:
-                                if( !isSpecifMultiLanguageText( val ) ) {
+                                if( !isMultiLanguageValue( val ) ) {
                                     errorL.push({status:985, statusText: etxt+": all values must be a list (of multi-language objects)"});
                                     return;
                                 };
@@ -527,16 +527,19 @@ export class CCheck {
         function isString(el) {
             return typeof(el)=='string';
         }
-        function isSpecifMultiLanguageText(L) {
-            if( Array.isArray(L) ) {
-                let hasMultipleLanguages = L.length>1;
-                for(var i=L.length-1;i>-1;i--) {
-                    // SpecifMultilanguageText is a list of objects {text:"the text value", language:"IETF language tag"}
-                    if( typeof(L[i]["text"])!="string" || ( hasMultipleLanguages && (typeof(L[i].language)!="string" || L[i].language.length<2 )) ) return false;
-                };
-                return true;
-            };
-            return false;
+        function isMultiLanguageValue(L) {
+			if (Array.isArray(L)) {
+				let hasMultipleLanguages = L.length > 1;
+				for (var i = L.length - 1; i > -1; i--) {
+					let lE = L[i];
+					// SpecifMultilanguageText is a list of objects {text:"the text value", language:"IETF language tag"}.
+					// If there are multiple language values, all except the first (=default) must have a language property:
+					if (typeof (lE["text"]) != "string" || (hasMultipleLanguages && i>0 && (typeof (lE.language) != "string" || lE.language.length < 2)))
+						return false;
+				}
+				return true;
+			};
+			return false;
         }
         function itemByKey( L, k ) {
             // Return the item in L with key k 
