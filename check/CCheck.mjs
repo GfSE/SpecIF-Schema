@@ -8,6 +8,9 @@
 export class CCheck {
     constructor() {
         this.ajv = new Ajv({allErrors: true});
+		this.regex = {
+			IsoDateTime: /^(\d{4})-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\d|30|31)(?:T([0-1]\d|2[0-4]):([0-5]\d):([0-5]\d(?:\.\d{1,3})?)(\+(0\d|11|12):([0-5]\d)|-(0\d|11|12):([0-5]\d)|Z)?)?$/
+		};
     }
     checkSchema( data, options ) {
         "use strict";
@@ -190,7 +193,7 @@ export class CCheck {
                                 for(var i=dT.enumeration.length-1;i>-1;i--) {
                                     // The presence of valid ids has been checked by schema, now check the values:
                                     if( dT.type=="xs:string" ) {
-                                        if( !isSpecifMultiLanguageText( dT.enumeration[i].value ) )
+                                        if( !isMultiLanguageValue( dT.enumeration[i].value ) )
                                             errorL.push({status:974, statusText: "dataType '"+dT.id+"' of type 'xs:string' must have enumerated values, each with a list of multi-language texts"});
                                     }
                                     else
@@ -371,7 +374,7 @@ export class CCheck {
                         switch(dT.type) {
                             case 'xs:string':
                                 // The values of a property of type 'xs:string' are multi-language objects:
-                                if( !isSpecifMultiLanguageText( val ) ) {
+                                if( !isMultiLanguageValue( val ) ) {
                                     errorL.push({status:985, statusText: etxt+": all values must be a list (of multi-language objects)"});
                                     return;
                                 };
@@ -390,18 +393,7 @@ export class CCheck {
                                     errorL.push({status:986, statusText:etxt+": boolean value is invalid"}); 
                                 break;
                             case 'xs:dateTime':
-                                if( self.checkSchema(
-                                    {value:val},
-                                    {schema: {
-                                        "$id": "https://specif.de/v1.1/dateTime/schema#",
-                                        "$schema": "http://json-schema.org/draft-04/schema#",
-                                //        "$schema": "https://json-schema.org/draft/2019-09/schema#",
-                                        "type": "object",
-                                        "properties": {
-                                          "value": { "type": "string", "format": "date-time" }
-                                        }
-                                    }}
-                                ).status>0 )
+								if( !self.regex.IsoDateTime.test(val) )
                                     errorL.push({status:986, statusText: etxt+": value must be a valid date-time string according to ISO 8601"});
                                 break;
                             case 'xs:duration':
@@ -527,16 +519,19 @@ export class CCheck {
         function isString(el) {
             return typeof(el)=='string';
         }
-        function isSpecifMultiLanguageText(L) {
-            if( Array.isArray(L) ) {
-                let hasMultipleLanguages = L.length>1;
-                for(var i=L.length-1;i>-1;i--) {
-                    // SpecifMultilanguageText is a list of objects {text:"the text value", language:"IETF language tag"}
-                    if( typeof(L[i]["text"])!="string" || ( hasMultipleLanguages && (typeof(L[i].language)!="string" || L[i].language.length<2 )) ) return false;
-                };
-                return true;
-            };
-            return false;
+        function isMultiLanguageValue(L) {
+			if (Array.isArray(L)) {
+				let hasMultipleLanguages = L.length > 1;
+				for (var i = L.length - 1; i > -1; i--) {
+					let lE = L[i];
+					// SpecifMultilanguageText is a list of objects {text:"the text value", language:"IETF language tag"}.
+					// If there are multiple language values, all except the first (=default) must have a language property:
+					if (typeof (lE["text"]) != "string" || (hasMultipleLanguages && i>0 && (typeof (lE.language) != "string" || lE.language.length < 2)))
+						return false;
+				}
+				return true;
+			};
+			return false;
         }
         function itemByKey( L, k ) {
             // Return the item in L with key k 
