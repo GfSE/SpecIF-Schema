@@ -1,7 +1,7 @@
 {
-  "$id": "https://specif.de/v1.1/schema#",
+  "$id": "https://specif.de/v1.2/schema#",
   "$schema": "https://json-schema.org/draft/2019-09/schema#",
-  "title": "JSON-Schema for SpecIF v1.1",
+  "title": "JSON-Schema for SpecIF v1.2",
   "description": "The Specification Integration Facility (SpecIF) integrates partial system models from different methods and tools in a semantic net. Collaborators shall browse, search and audit engineering results in a common context. Also, the exchange of model information between organizations and tools is facilitated. SpecIF represents the visible, i.e. the diagrams and the text, as well as the semantics of system specifications. UTF-8 encoding is preferred.",
   "definitions": {
     "SpecifId": {
@@ -124,28 +124,32 @@
       "type": "string",
       "enum": [ "plain", "xhtml" ]
     },
+    "SpecifLanguageText": {
+      "description": "A Text with optional indication of format and language.",
+      "type": "object",
+      "properties": {
+        "text": {
+          "description": "A string containing some text.",
+          "type": "string"
+        },
+        "format": {
+          "description": "By default, the format is assumed 'plain'.",
+          "$ref": "#/definitions/SpecifTextFormat"
+        },
+        "language": {
+          "description": "An IETF language tag such as 'en', 'en-US, 'fr' or 'de'.",
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [ "text" ]
+    },
     "SpecifMultiLanguageText": {
       "description": "A list of items with text and language properties. If the information is provided in multiple languages, the language must be specified for proper selection; it is however not required by the schema to avoid a lot of overhead in most cases with a single language.",
       "type": "array",
       "uniqueItems": true,
       "items": {
-        "type": "object",
-        "properties": {
-          "text": {
-            "description": "A string containing some text.",
-            "type": "string"
-          },
-          "format": {
-            "description": "By default, the format is assumed 'plain'.",
-            "$ref": "#/definitions/SpecifTextFormat"
-          },
-          "language": {
-            "description": "An IETF language tag such as 'en', 'en-US, 'fr' or 'de'.",
-            "type": "string"
-          }
-        },
-        "additionalProperties": false,
-        "required": [ "text" ]
+        "$ref": "#/definitions/SpecifLanguageText"
       }
     },
     "SpecifValue": {
@@ -203,12 +207,12 @@
       "type": "string"
     },
     "SpecifInstantiation": {
-      "description": "Indicates whether an instance of the class is created automatically, manually or both. All is allowed, if the property is omitted. The class is abstract and cannot be instantiated, if the property list is present, but empty.",
+      "description": "Indicates whether an instance of the class is created automatically, manually or both. Manual and automatic instantiation is allowed, if the property is omitted. The class is abstract and cannot be instantiated, if the value is 'never' or the property list is present, but empty. The explicit case using 'never' is preferred; the latter is used by earlier versions.",
       "type": "array",
       "uniqueItems": true,
       "items": {
         "type": "string",
-        "enum": [ "auto", "user" ]
+        "enum": [ "never", "auto", "user" ]
       }
     },
     "SpecifDataType": {
@@ -270,7 +274,7 @@
               "$ref": "#/definitions/SpecifEnumeratedValues"
             },
             "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'.",
+              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
               "type": "boolean"
             },
             "revision": {
@@ -322,7 +326,7 @@
               "$ref": "#/definitions/SpecifEnumeratedValues"
             },
             "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'.",
+              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
               "type": "boolean"
             },
             "revision": {
@@ -380,7 +384,7 @@
               "$ref": "#/definitions/SpecifEnumeratedValues"
             },
             "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'.",
+              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
               "type": "boolean"
             },
             "revision": {
@@ -428,7 +432,11 @@
               "$ref": "#/definitions/SpecifEnumeratedValues"
             },
             "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'.",
+              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
+              "type": "boolean"
+            },
+            "multiLanguage": {
+              "description": "Indicates whether a value can be assigned in multiple languages; by default the value is 'false'.",
               "type": "boolean"
             },
             "revision": {
@@ -466,7 +474,7 @@
           "$ref": "#/definitions/SpecifKey"
         },
         "multiple": {
-          "description": "Optional use by all propertyClasses. Indicates whether multiple values can be given. If omitted, the 'multiple' property of the dataType applies; by default the value is 'false'.",
+          "description": "Optional use by all propertyClasses. Indicates whether multiple values can be given.",
           "type": "boolean"
         },
         "values": {
