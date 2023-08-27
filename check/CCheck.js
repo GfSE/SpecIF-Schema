@@ -253,14 +253,19 @@ class CCheck {
         }
         function checkStatementClasses() {    
             // All statementClass' "subjectClasses" must be the key of a member of "resourceClasses" or "statementClasses". 
+            // No subjectClasses resp. objectClasses means all classes are eligible.
+            // The propertyClasses have already been checked by checkClsses().
             // "subjectClasses" is optional, but if present, the list may not be empty (as enforced by the schema).
             // Similarly for "objectClasses".
             function missingRef(aCL,cL) {
-                // No subjectClasses resp. objectClasses means all classes are eligible.
-                // The propertyClasses have already been checked by checkClsses().
                 if( Array.isArray(cL) ) {
                     // if present, the class list must have at least one member:
                     if( cL.length<1 ) return true;
+                };
+                return false;
+            }
+            function invalidRef(aCL,cL) {
+                if( Array.isArray(cL) ) {
                     // each value in cL must be the key of a member of aCL:
                     for( var i=cL.length-1;i>-1;i-- ) {
                         if( uniqueByKey(aCL, cL[i]) ) return true;
@@ -274,8 +279,12 @@ class CCheck {
                 checkPropertyClassReference( statementC );
                 // For each statement class, check subject classes and object classes:
                 [subClasses,objClasses].forEach( function(x) {  
-                    if( options.doCheck.includes('statementClass.'+x) && missingRef(aCL, statementC[x]) ) 
-                        errorL.push({status:978, statusText: x+" of "+sClass+" '"+statementC.id+"' must reference at least one valid resourceClass or statementClass" });
+                    if( options.doCheck.includes('statementClass.'+x) ) {
+						if( missingRef(aCL, statementC[x]) ) 
+							errorL.push({status:978, statusText: x+" of "+sClass+" '"+statementC.id+"' must reference at least one valid resourceClass or statementClass" });
+						if( invalidRef(aCL, statementC[x]) ) 
+							errorL.push({status:978, statusText: x+" of "+sClass+" '"+statementC.id+"' references at least one invalid resourceClass or statementClass" })
+					};
                 });
             });
             // The key of 'extends' must specify a valid statement class: 

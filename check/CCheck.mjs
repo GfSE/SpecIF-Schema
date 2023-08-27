@@ -253,14 +253,19 @@ export class CCheck {
         }
         function checkStatementClasses() {    
             // All statementClass' "subjectClasses" must be the key of a member of "resourceClasses" or "statementClasses". 
+            // No subjectClasses resp. objectClasses means all classes are eligible.
+            // The propertyClasses have already been checked by checkClsses().
             // "subjectClasses" is optional, but if present, the list may not be empty (as enforced by the schema).
             // Similarly for "objectClasses".
             function missingRef(aCL,cL) {
-                // No subjectClasses resp. objectClasses means all classes are eligible.
-                // The propertyClasses have already been checked by checkClsses().
                 if( Array.isArray(cL) ) {
                     // if present, the class list must have at least one member:
                     if( cL.length<1 ) return true;
+                };
+                return false;
+            }
+            function invalidRef(aCL,cL) {
+                if( Array.isArray(cL) ) {
                     // each value in cL must be the key of a member of aCL:
                     for( var i=cL.length-1;i>-1;i-- ) {
                         if( uniqueByKey(aCL, cL[i]) ) return true;
@@ -274,8 +279,12 @@ export class CCheck {
                 checkPropertyClassReference( statementC );
                 // For each statement class, check subject classes and object classes:
                 [subClasses,objClasses].forEach( function(x) {  
-                    if( options.doCheck.includes('statementClass.'+x) && missingRef(aCL, statementC[x]) ) 
-                        errorL.push({status:978, statusText: x+" of "+sClass+" '"+statementC.id+"' must reference at least one valid resourceClass or statementClass" });
+                    if( options.doCheck.includes('statementClass.'+x) ) {
+						if( missingRef(aCL, statementC[x]) ) 
+							errorL.push({status:978, statusText: x+" of "+sClass+" '"+statementC.id+"' must reference at least one valid resourceClass or statementClass" });
+						if( invalidRef(aCL, statementC[x]) ) 
+							errorL.push({status:978, statusText: x+" of "+sClass+" '"+statementC.id+"' references at least one invalid resourceClass or statementClass" })
+					};
                 });
             });
             // The key of 'extends' must specify a valid statement class: 
@@ -393,6 +402,19 @@ export class CCheck {
                                     errorL.push({status:986, statusText:etxt+": boolean value is invalid"}); 
                                 break;
                             case 'xs:dateTime':
+                            /* This is too restrictive, as right-truncated data is not accepted:
+							if( self.checkSchema(
+                                    {value:val},
+                                    {schema: {
+                                        "$id": "https://specif.de/v1.1/dateTime/schema#",
+                                        "$schema": "http://json-schema.org/draft-04/schema#",
+                                //        "$schema": "https://json-schema.org/draft/2019-09/schema#",
+                                        "type": "object",
+                                        "properties": {
+                                          "value": { "type": "string", "format": "date-time" }
+                                        }
+                                    }}
+                                ).status>0 )  */
 								if( !self.regex.IsoDateTime.test(val) )
                                     errorL.push({status:986, statusText: etxt+": value must be a valid date-time string according to ISO 8601"});
                                 break;
