@@ -165,7 +165,7 @@
       ]
     },
     "SpecifValues": {
-      "description": "If 'multiple' of the propertyClass is undefined or false, the array must contain one item. If the value is unknown, omit the whole property. By default, the class' value applies.",
+      "description": "If 'multiple' of the propertyClass is undefined or false, the array must contain one item. If the value is unknown, omit the whole property. By default, the class' values apply.",
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
@@ -435,10 +435,6 @@
               "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
               "type": "boolean"
             },
-            "multiLanguage": {
-              "description": "Indicates whether a value can be assigned in multiple languages; by default the value is 'false'.",
-              "type": "boolean"
-            },
             "revision": {
               "$ref": "#/definitions/SpecifRevision"
             },
@@ -473,12 +469,20 @@
           "description": "Must be a member of dataTypes.",
           "$ref": "#/definitions/SpecifKey"
         },
+        "isMandatory": {
+          "description": "Optional use. Indicates whether an instance must be assigned; by default it is 'false'. If 'true', any 'values' defined in this class are ueseless.",
+          "type": "boolean"
+        },
         "multiple": {
-          "description": "Optional use by all propertyClasses. Indicates whether multiple values can be given.",
+          "description": "Optional use. Indicates whether multiple values can be given to an instance. By default, it is 'false'.",
+          "type": "boolean"
+        },
+        "multiLanguage": {
+          "description": "Optional use by propertyClasses with dataType 'xs:string'. Indicates whether an instance value can be assigned in multiple languages; by default the value is 'false'.",
           "type": "boolean"
         },
         "values": {
-          "description": "An optional list of default values in case the instantiated resource's or statement's property is missing.",
+          "description": "An optional list of default values in case the instantiated resource's or statement's property is missing. Is useless, if 'isMandatory' is true.",
           "$ref": "#/definitions/SpecifValues"
         },
         "format": {
