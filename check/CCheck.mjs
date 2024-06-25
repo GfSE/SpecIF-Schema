@@ -324,25 +324,29 @@ export class CCheck {
 
                 let staC = itemByKey( data[sClasses], sta[sClass] );   // the statement's class
                 
-                // If there are no staC[subClasses], all subjectClasses are eligible and so no checking is necessary.
-                if( Array.isArray(staC[subClasses]) && subj ) {
-                    let eligibleCL = [];                              // the list of eligible classes
-                    staC[subClasses].forEach( function(c) { let e=itemByKey( classL, c ); if(e) eligibleCL.push(e); });
+				if(staC) {
+					// If there are no staC[subClasses], all subjectClasses are eligible and so no checking is necessary.
+					if( Array.isArray(staC[subClasses]) && subj ) {
+						let eligibleCL = [];                              // the list of eligible classes
+						staC[subClasses].forEach( function(c) { let e=itemByKey( classL, c ); if(e) eligibleCL.push(e); });
 
-                    // The subject's class must be listed in the statementClass' subjectClasses;
-                    // resources and statements are eligible, both have the same 'class' attribute, so subj[rClass] covers all cases:
-                    if( uniqueByKey( eligibleCL, subj[rClass] ) )
-                        errorL.push({status:981, statusText: "the subject of statement["+i+"] with identifier '"+sta.id+"' has a class which is not listed in the "+subClasses+" of the statement's class"});
-                };
+						// The subject's class must be listed in the statementClass' subjectClasses;
+						// resources and statements are eligible, both have the same 'class' attribute, so subj[rClass] covers all cases:
+						if( uniqueByKey( eligibleCL, subj[rClass] ) )
+							errorL.push({status:981, statusText: "the subject of statement["+i+"] with identifier '"+sta.id+"' has a class which is not listed in the "+subClasses+" of the statement's class"});
+					};
 
-                // ... and similarly for object's class: 
-                if( Array.isArray(staC[objClasses]) && obj ) {
-                    let eligibleCL = [];                              // the list of eligible classes
-                    staC[objClasses].forEach( function(c) { let e=itemByKey( classL, c ); if(e) eligibleCL.push(e); });
+					// ... and similarly for object's class: 
+					if( Array.isArray(staC[objClasses]) && obj ) {
+						let eligibleCL = [];                              // the list of eligible classes
+						staC[objClasses].forEach( function(c) { let e=itemByKey( classL, c ); if(e) eligibleCL.push(e); });
 
-                    if( uniqueByKey( eligibleCL, obj[[rClass]] ) )
-                        errorL.push({status:981, statusText: "the object of statement["+i+"] with identifier '"+sta.id+"' has a class which is not listed in the "+objClasses+" of the statement's class"});
-                };
+						if( uniqueByKey( eligibleCL, obj[[rClass]] ) )
+							errorL.push({status:981, statusText: "the object of statement["+i+"] with identifier '"+sta.id+"' has a class which is not listed in the "+objClasses+" of the statement's class"});
+					};
+				}
+				else
+                    errorL.push({status:982, statusText: "the class of statement["+i+"] with identifier '"+sta.id+"' has not been found"});
             });
 
             // property values ("content") must fit the respective class' range:
@@ -497,6 +501,9 @@ export class CCheck {
                 
                 // recursively build the list of propertyClasses from the instance's class and any parent classes:
                 function addPropertyClasses(insClass) {
+					// any missing class has been discovered before, but shall not lead to a runtime error, here:
+					if( !insClass )
+						return;
                     allPropertyClasses = allPropertyClasses.concat(insClass.propertyClasses||[]);
                     if( typeof(insClass['extends'])=='object' ) addPropertyClasses(itemByKey(classL,insClass['extends']));
                 };
