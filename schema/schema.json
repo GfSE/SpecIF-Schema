@@ -203,7 +203,7 @@
       "format": "date-time"
     },
     "SpecifIcon": {
-      "description": "A symbol for display as a prefix to titles; applicable to all instances of the class. Is usually a XML-encoded UTF-8 symbol, can be an URL or dataURL.",
+      "description": "A symbol for display as a prefix to titles; applicable to all instances of the class. Is often a XML-encoded UTF-8 symbol, can be an URL or dataURL.",
       "type": "string"
     },
     "SpecifInstantiation": {
@@ -270,12 +270,8 @@
               "$ref": "#/definitions/SpecifMultiLanguageText"
             },
             "enumeration": {
-              "description": "An optional list of values to choose from for a specific instance; multiple values are allowed, if 'multiple' is set to 'true'.",
+              "description": "An optional list of values to choose from for a specific instance.",
               "$ref": "#/definitions/SpecifEnumeratedValues"
-            },
-            "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
-              "type": "boolean"
             },
             "revision": {
               "$ref": "#/definitions/SpecifRevision"
@@ -322,12 +318,8 @@
               "description": "Optional use by dataTypes 'xs:integer' and 'xs:double'."
             },
             "enumeration": {
-              "description": "An optional list of values to choose from for a specific instance; multiple values are allowed, if 'multiple' is set to 'true'.",
+              "description": "An optional list of values to choose from for a specific instance.",
               "$ref": "#/definitions/SpecifEnumeratedValues"
-            },
-            "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
-              "type": "boolean"
             },
             "revision": {
               "$ref": "#/definitions/SpecifRevision"
@@ -380,12 +372,8 @@
               "title": "Maximum Value of a Number"
             },
             "enumeration": {
-              "description": "An optional list of values to choose from for a specific instance; multiple values are allowed, if 'multiple' is set to 'true'.",
+              "description": "An optional list of values to choose from for a specific instance.",
               "$ref": "#/definitions/SpecifEnumeratedValues"
-            },
-            "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
-              "type": "boolean"
             },
             "revision": {
               "$ref": "#/definitions/SpecifRevision"
@@ -428,12 +416,8 @@
               "minimum": 0
             },
             "enumeration": {
-              "description": "An optional list of values to choose from for a specific instance; multiple values are allowed, if 'multiple' is set to 'true'.",
+              "description": "An optional list of values to choose from for a specific instance.",
               "$ref": "#/definitions/SpecifEnumeratedValues"
-            },
-            "multiple": {
-              "description": "Indicates whether multiple values are allowed; by default the value is 'false'. Is DEPRECATED for a dataType - use the 'multiple' attribute for a propertyClass instead.",
-              "type": "boolean"
             },
             "revision": {
               "$ref": "#/definitions/SpecifRevision"
@@ -469,20 +453,20 @@
           "description": "Must be a member of dataTypes.",
           "$ref": "#/definitions/SpecifKey"
         },
-        "isMandatory": {
-          "description": "Optional use. Indicates whether an instance must be assigned; by default it is 'false'. If 'true', any 'values' defined in this class are ueseless.",
-          "type": "boolean"
-        },
         "multiple": {
-          "description": "Optional use. Indicates whether multiple values can be given to an instance. By default, it is 'false'.",
+          "description": "Optional use. Indicates whether multiple values can be given to an instance. By default it is 'false'.",
           "type": "boolean"
         },
         "multiLanguage": {
-          "description": "Optional use by propertyClasses with dataType 'xs:string'. Indicates whether an instance value can be assigned in multiple languages; by default the value is 'false'.",
+          "description": "Optional use by propertyClasses with dataType 'xs:string'. Indicates whether an instance value can be assigned in multiple languages. By default it is 'false'.",
+          "type": "boolean"
+        },
+        "required": {
+          "description": "Optional use. Indicates whether an instance must be assigned; by default it is 'false'. If 'true', any default 'values' defined in this class are useless.",
           "type": "boolean"
         },
         "values": {
-          "description": "An optional list of default values in case the instantiated resource's or statement's property is missing. Is useless, if 'isMandatory' is true.",
+          "description": "An optional list of default values in case the instantiated resource's or statement's property is missing. Is useless, if 'required' is true.",
           "$ref": "#/definitions/SpecifValues"
         },
         "format": {
@@ -766,7 +750,7 @@
           "$ref": "#/definitions/SpecifMultiLanguageText"
         },
         "url": {
-          "description": "An absolute or relative URL to the file; will be of format 'uri-reference' in future. If missing, the title applies.",
+          "description": "An absolute or relative URL to the file; will be of format 'uri-reference' in future. A dataURL is allowed. If missing, the title applies.",
           "type": "string"
         },
         "type": {
@@ -795,7 +779,7 @@
       "description": "An absolute URL pointing to this SpecIF schema. Supports both specif.de and schemastore.org.",
       "type": "string",
       "format": "uri",
-      "pattern": "^https?:\\/\\/(specif\\.de\\/v1\\.1\\/schema|json\\.schemastore\\.org\\/specif-1\\.1)\\.json$"
+      "pattern": "^https?:\\/\\/(specif\\.de\\/v1\\.2\\/schema|json\\.schemastore\\.org\\/specif-1\\.2)\\.json$"
     },
     "id": {
       "$ref": "#/definitions/SpecifId"
@@ -804,11 +788,11 @@
       "$ref": "#/definitions/SpecifRevision"
     },
     "title": {
-      "description": "The project's name; if missing, the first hierarchy node's title applies.",
+      "description": "The project's name; if missing, the first item's title of the 'nodes' list applies.",
       "$ref": "#/definitions/SpecifMultiLanguageText"
     },
     "description": {
-      "description": "The project's description; if missing, the first hierarchy node's description applies.",
+      "description": "The project's description; if missing, the first item's description of the 'nodes' list applies.",
       "$ref": "#/definitions/SpecifMultiLanguageText"
     },
     "isExtension": {
@@ -882,7 +866,7 @@
         "$ref": "#/definitions/SpecifStatement"
       }
     },
-    "hierarchies": {
+    "nodes": {
       "description": "A list of hierarchies with pointers to resources; may be nested to build a tree, i.e. a hierarchy of pointers.",
       "$ref": "#/definitions/SpecifNodes"
     },
@@ -904,6 +888,6 @@
     "statementClasses",
     "resources",
     "statements",
-    "hierarchies"
+    "nodes"
   ]
 }

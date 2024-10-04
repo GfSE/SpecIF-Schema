@@ -1,4 +1,4 @@
-/*  Schema and constraint checking for native SpecIF data in JSON format. 
+/*  Schema and constraint checking for native SpecIF v1.2 data in JSON format. 
 *   Requires: ajv 4.8 or higher.
 *   License: Apache 2.0 (http://www.apache.org/licenses/)
 *   Author: se@enso-managers.de, enso managers gmbh, Berlin (http://www.enso-managers.de)
@@ -32,7 +32,7 @@ class CCheck {
     checkConstraints( data, options ) {
         "use strict";
         // Check the constraints of the concrete values in 'data'.
-        // SpecIF schema v1.1 is supported.
+        // SpecIF schema v1.2 is supported.
         // An object similar to jqXHR, namely {status:900,statusText:"abc",responseType:"text",responseText:"xyz"}, is returned.
         // ToDo: localize messages
 
@@ -47,16 +47,19 @@ class CCheck {
         // - 'statement.object'
         // - 'text.length'
 
-        if( data.specifVersion )
+        if( !data['$schema'] )
             return { status: 971, statusText: "This constraint checker does not support any SpecIF version below 1.1" };
 
         switch( data['$schema'] ) {
-            case "https://specif.de/v1.1/schema.json":
-            case "https://json.schemastore.org/specif-1.1.json":
+            case "https://specif.de/v1.2/schema.json":
+            case "https://json.schemastore.org/specif-1.2.json":
                 break;
             case "https://specif.de/v1.0/schema.json":
             case "https://json.schemastore.org/specif-1.0.json":
                 return { status: 971, statusText: "This constraint checker does not support SpecIF version 1.0" };
+            case "https://specif.de/v1.1/schema.json":
+            case "https://json.schemastore.org/specif-1.1.json":
+                return { status: 971, statusText: "This constraint checker does not support SpecIF version 1.1" };
             default:
                 return { status: 972, statusText: "Invalid schema location" };
         };
@@ -75,6 +78,7 @@ class CCheck {
             rClass = 'class',
             sClass = 'class',
             pClass = 'class',
+			nds = 'nodes',
             subClasses = 'subjectClasses',
             objClasses = 'objectClasses',
             fractionDigits = 'fractionDigits',
@@ -107,7 +111,7 @@ class CCheck {
         checkStatements();
 
         // A hierarchy node's "resource" must be the key of a member of "resources":
-        checkNodes( data.resources, data.hierarchies, 0 );
+        checkNodes( data.resources, data[nds], 0 );
 
         return errorL.length<1?{ status: 0, statusText: 'SpecIF constraints have been checked successfully!' }
                 :{ status: 973, statusText: 'SpecIF constraints are violated', responseType: 'text', responseText: errorsText(errorL) };
@@ -167,7 +171,7 @@ class CCheck {
                 { list:data[sClasses], name:'statementClass' },
                 { list:data.resources, name:'resource' },
                 { list:data.statements, name:'statement' },
-                { list:data.hierarchies, name:'hierarchy or node' },
+                { list:data[nds], name:'node' },
                 { list:data.files, name:'file' }
             ].forEach( function( def ) {
                 let dK = duplicateKey(def.list);
@@ -358,8 +362,7 @@ class CCheck {
 
             let dT = itemByKey(data.dataTypes,prpC.dataType);
             if( !dT ) {
-                // Has been checked already in checkPropertyClasses():
-            //  errorL.push({status:975, statusText: "property class '"+prpC.id+"' must reference a valid dataType"});
+                // checkPropertyClasses() already has added an error message for this case, but avoid a crash:
                 return;    
             };                
 
@@ -368,10 +371,8 @@ class CCheck {
             if( Array.isArray(prpValues) ) {
 
                 // Check the length of the value list:
-                // If the propertyClass defines 'multiple' explicitly, either 'true' or 'false', it supersedes the dataType's definition;
-                // thus the dataType's definition comes only into effect, if the propertyClass has no 'multiple' attribute at all:
-                if( !(prpC.multiple || typeof(prpC.multiple)!='boolean' && dT.multiple) && prpValues.length>1 )
-                    errorL.push({status:983, statusText: etxt+": neither propertyClass nor dataType allow multiple values"});
+                if( !prpC.multiple && prpValues.length>1 )
+                    errorL.push({status:983, statusText: etxt+": propertyClass does not allow multiple values"});
                 
                 prpValues.forEach( function(val) {
 
