@@ -38,7 +38,7 @@
       }
     },
     "SpecifRevision": {
-      "description": "A globally unique revision tag with one or multiple blocks with alphanumeric characters separated by a special character [.:,;/-]. Sequential as well as branching/merging notations are possible.",
+      "description": "A globally unique revision tag with one or multiple blocks with alphanumeric characters separated by a special character [.:,;/-].",
       "type": "string",
       "pattern": "^(?:[0-9a-zA-Z]+[.:,;\/-])*[0-9a-zA-Z]+$"
     },
@@ -155,17 +155,37 @@
     "SpecifValue": {
       "oneOf": [
         {
-          "description": "For properties with a dataType other than 'xs:string'.",
+          "description": "A multi-language value of a property with dataType 'xs:string'.",
+          "$ref": "#/definitions/SpecifMultiLanguageText"
+        },
+        {
+          "description": "A simple value of a property with a dataType other than 'xs:string'.",
           "type": "string"
         },
         {
-          "description": "For properties with dataType 'xs:string'.",
-          "$ref": "#/definitions/SpecifMultiLanguageText"
+          "description": "A pointer to an enumerated value of any dataType (except boolean).",
+          "type": "object",
+          "properties": {
+            "id": {
+              "$ref": "#/definitions/SpecifId"
+            }
+          },
+          "additionalProperties": false,
+          "required": [ "id" ]
+        },
+        {
+          "description": "A sequence of values according to the complex dataType as specified by the propertyClass.",
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": false,
+          "items": {
+            "$ref": "#/definitions/SpecifValue"
+          }
         }
       ]
     },
     "SpecifValues": {
-      "description": "If 'multiple' of the propertyClass is undefined or false, the array must contain one item. If the value is unknown, omit the whole property. By default, the class' values apply.",
+      "description": "If 'multiple' of the propertyClass is undefined or false, the array must contain exactly one item. If the value is unknown, omit the whole property. By default, the class' values apply.",
       "type": "array",
       "minItems": 1,
       "uniqueItems": true,
@@ -192,6 +212,7 @@
       "type": "array",
       "title": "Enumerated Values",
       "description": "Enumerated values for the given dataType. If 'multiple' is true 0..n options may be selected, otherwise exactly one must be selected.",
+      "minItems": 1,
       "uniqueItems": true,
       "items": {
         "$ref": "#/definitions/SpecifEnumeratedValue"
@@ -207,7 +228,7 @@
       "type": "string"
     },
     "SpecifInstantiation": {
-      "description": "Indicates whether an instance of the class is created automatically, manually or both. Manual and automatic instantiation is allowed, if the property is omitted. The class is abstract and cannot be instantiated, if the value is 'never' or the property list is present, but empty. The explicit case using 'never' is preferred; the latter is used by earlier versions.",
+      "description": "Indicates whether an instance of the class is created automatically, manually or both. Manual and automatic instantiation is allowed, if the property is omitted. The class is abstract and cannot be instantiated, if the value is 'never' or the property list is present, but empty. Using 'never' explicitly is preferred; an empty list is used by earlier versions. The options 'auto' and 'user' can be listed alone and together, but obviously not with 'never'.",
       "type": "array",
       "uniqueItems": true,
       "items": {
@@ -434,6 +455,60 @@
           },
           "additionalProperties": false,
           "required": [ "id", "title", "type", "changedAt" ]
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "description": "The corresponding definition in https://www.w3.org/TR/xmlschema-2/ applies.",
+              "type": "string",
+              "title": "Complex data-type",
+              "enum": [ "xs:complexType" ]
+            },
+            "id": {
+              "$ref": "#/definitions/SpecifId"
+            },
+            "title": {
+              "$ref": "#/definitions/SpecifText"
+            },
+            "description": {
+              "$ref": "#/definitions/SpecifMultiLanguageText"
+            },
+            "sequence": {
+              "description": "A sequence of simple or complex dataTypes; the resulting data-type may have multiple levels and must be a tree.",
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "$ref": "#/definitions/SpecifText"
+                  },
+                  "dataType": {
+                    "description": "Must be a member of dataTypes.",
+                    "$ref": "#/definitions/SpecifKey"
+                  }
+                },
+                "additionalProperties": false,
+                "required": [ "title", "dataType" ]
+              }
+            },
+            "revision": {
+              "$ref": "#/definitions/SpecifRevision"
+            },
+            "replaces": {
+              "$ref": "#/definitions/SpecifReplaces"
+            },
+            "changedAt": {
+              "$ref": "#/definitions/SpecifDateTime"
+            },
+            "changedBy": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [ "id", "title", "type", "sequence", "changedAt" ]
         }
       ]
     },
@@ -454,7 +529,7 @@
           "$ref": "#/definitions/SpecifKey"
         },
         "multiple": {
-          "description": "Optional use. Indicates whether multiple values can be given to an instance. By default it is 'false'.",
+          "description": "Optional use. Indicates whether multiple values can be given to a property instance. By default it is 'false'.",
           "type": "boolean"
         },
         "multiLanguage": {
